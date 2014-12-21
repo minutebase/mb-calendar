@@ -1,0 +1,39 @@
+<div class="calendar__meta">
+  <span class="calendar__current-month">
+    {{format-time currentMonth "calendar.monthTitle"}}
+  </span>
+
+  <span class="calendar__nav">
+    <button {{action "showPrevMonth"}} class="calendar__nav-item calendar__nav-item--previous">&lt;</button>
+    <button {{action "showThisMonth"}} class="calendar__nav-item calendar__nav-item--today">o</button>
+    <button {{action "showNextMonth"}} class="calendar__nav-item calendar__nav-item--next">&gt;</button>
+  </span>
+</div>
+
+{{#liquid-with currentMonth as currentCalendarMonth enableGrowth=false class="anim-mb-calendar"}}
+
+  <table class="calendar__table">
+    <thead>
+      <tr>
+        {{#each daysOfWeek as |day|}}
+          <th class="calendar__day-name">{{format-time day "calendar.dayName"}}</th>
+        {{/each}}
+      </tr>
+    </thead>
+    <tbody>
+      {{#each weeks as |week|}}
+        <tr>
+          {{#each week.days as |day|}}
+            <td
+              class="calendar__day {{day.isTodayClass}} {{day.isOtherMonthClass}} {{day.isWeekendClass}} {{day.isSelectedClass}}"
+              {{action "selectDate" day.date}}
+            >
+              {{format-time day.date "calendar.dayNum"}}
+            </td>
+          {{/each}}
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+{{/liquid-with}}
