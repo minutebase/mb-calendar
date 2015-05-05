@@ -6,45 +6,61 @@ const Day = Ember.Object.extend({
   date:     null,
   calendar: null,
 
-  isToday: Ember.computed(function() {
-    return this.get("date").isSame(moment.utc(), "day");
-  }),
-
-  isSelected: Ember.computed("calendar.selected", function() {
-    const selected = this.get("calendar.selected");
-    return selected && selected.isSame(this.get("date"), "day");
-  }),
-
-  isWeekend: Ember.computed(function() {
-    const dow = this.get("date").day();
-    return dow === 0 || dow === 6;
-  }),
-
-  isOtherMonth: Ember.computed(function() {
-    return !this.get("date").isSame(this.get("calendar.currentMonth"), "month");
-  }),
-
-  isTodayClass: Ember.computed("isToday", function() {
-    if (this.get("isToday")) {
-      return "calendar__day--today";
+  isToday: Ember.computed({
+    get() {
+      return this.get("date").isSame(moment.utc(), "day");
     }
   }),
 
-  isSelectedClass: Ember.computed("isSelected", function() {
-    if (this.get("isSelected")) {
-      return "calendar__day--selected";
+  isSelected: Ember.computed("calendar.selected", {
+    get() {
+      const selected = this.get("calendar.selected");
+      return selected && selected.isSame(this.get("date"), "day");
     }
   }),
 
-  isOtherMonthClass: Ember.computed("isOtherMonth", function() {
-    if (this.get("isOtherMonth")) {
-      return "calendar__day--other-month";
+  isWeekend: Ember.computed({
+    get() {
+      const dow = this.get("date").day();
+      return dow === 0 || dow === 6;
     }
   }),
 
-  isWeekendClass: Ember.computed("isWeekend", function() {
-    if (this.get("isWeekend")) {
-      return "calendar__day--weekend";
+  isOtherMonth: Ember.computed({
+    get() {
+      return !this.get("date").isSame(this.get("calendar.currentMonth"), "month");
+    }
+  }),
+
+  isTodayClass: Ember.computed("isToday", {
+    get() {
+      if (this.get("isToday")) {
+        return "calendar__day--today";
+      }
+    }
+  }),
+
+  isSelectedClass: Ember.computed("isSelected", {
+    get() {
+      if (this.get("isSelected")) {
+        return "calendar__day--selected";
+      }
+    }
+  }),
+
+  isOtherMonthClass: Ember.computed("isOtherMonth", {
+    get() {
+      if (this.get("isOtherMonth")) {
+        return "calendar__day--other-month";
+      }
+    }
+  }),
+
+  isWeekendClass: Ember.computed("isWeekend", {
+    get() {
+      if (this.get("isWeekend")) {
+        return "calendar__day--weekend";
+      }
     }
   })
 });
@@ -53,18 +69,20 @@ const Week = Ember.Object.extend({
   date:     null,
   calendar: null,
 
-  days: Ember.computed(function() {
-    const start    = this.get("date");
-    const calendar = this.get("calendar");
+  days: Ember.computed({
+    get() {
+      const start    = this.get("date");
+      const calendar = this.get("calendar");
 
-    const days = Ember.A();
-    for (let i=0; i<7; i++) {
-      days.push(Day.create({
-        date:     start.clone().add(i, "days"),
-        calendar: calendar
-      }));
+      const days = Ember.A();
+      for (let i=0; i<7; i++) {
+        days.push(Day.create({
+          date:     start.clone().add(i, "days"),
+          calendar: calendar
+        }));
+      }
+      return days;
     }
-    return days;
   })
 });
 
@@ -77,9 +95,11 @@ export default Ember.Component.extend({
   currentMonth: null,
   weekStart:   'monday', // optionally set to "sunday" for USA
 
-  selectableClass: Ember.computed(function() {
-    if (this.get("select")) {
-      return "calendar--selectable";
+  selectableClass: Ember.computed({
+    get() {
+      if (this.get("select")) {
+        return "calendar--selectable";
+      }
     }
   }),
 
@@ -89,39 +109,45 @@ export default Ember.Component.extend({
     this.set('currentMonth', current);
   }),
 
-  weekStartModifier: Ember.computed('weekStart', function() {
-    if (this.get('weekStart') === 'monday') {
-      return 'isoweek';
-    } else {
-      return 'week';
+  weekStartModifier: Ember.computed('weekStart', {
+    get() {
+      if (this.get('weekStart') === 'monday') {
+        return 'isoweek';
+      } else {
+        return 'week';
+      }
     }
   }),
 
-  daysOfWeek: Ember.computed('weekStartModifier', function() {
-    const start = moment().startOf(this.get('weekStartModifier'));
-    const days = Ember.A();
-    for (let i=0; i<7; i++) {
-      days.push(start.clone().add(i, 'days'));
+  daysOfWeek: Ember.computed('weekStartModifier', {
+    get() {
+      const start = moment().startOf(this.get('weekStartModifier'));
+      const days = Ember.A();
+      for (let i=0; i<7; i++) {
+        days.push(start.clone().add(i, 'days'));
+      }
+      return days;
     }
-    return days;
   }),
 
-  weeks: Ember.computed('currentMonth', 'weekStartModifier', function() {
-    const current           = this.get('currentMonth');
-    const startOfMonth      = current.startOf('month');
-    const daysInMonth       = current.daysInMonth();
-    const startModifier     = this.get('weekStartModifier');
-    const daysFromWeekStart = current.diff(current.clone().startOf(startModifier), 'days');
-    const weeksInMonth      = Math.ceil((daysInMonth + daysFromWeekStart) / 7);
+  weeks: Ember.computed('currentMonth', 'weekStartModifier', {
+    get() {
+      const current           = this.get('currentMonth');
+      const startOfMonth      = current.startOf('month');
+      const daysInMonth       = current.daysInMonth();
+      const startModifier     = this.get('weekStartModifier');
+      const daysFromWeekStart = current.diff(current.clone().startOf(startModifier), 'days');
+      const weeksInMonth      = Math.ceil((daysInMonth + daysFromWeekStart) / 7);
 
-    const weeks = Ember.A();
-    for (let i=0; i<weeksInMonth; i++) {
-      weeks.push(Week.create({
-        date:     startOfMonth.clone().add(i, 'weeks').startOf(startModifier),
-        calendar: this
-      }));
+      const weeks = Ember.A();
+      for (let i=0; i<weeksInMonth; i++) {
+        weeks.push(Week.create({
+          date:     startOfMonth.clone().add(i, 'weeks').startOf(startModifier),
+          calendar: this
+        }));
+      }
+      return weeks;
     }
-    return weeks;
   }),
 
   actions: {
