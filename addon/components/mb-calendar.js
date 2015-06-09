@@ -103,6 +103,12 @@ export default Ember.Component.extend({
     }
   }),
 
+  isThisMonth: Ember.computed("currentMonth", {
+    get() {
+      return this.get("currentMonth").isSame(moment.utc(), "month");
+    }
+  }),
+
   defaultCurrentView: Ember.on('init', function() {
     const selected = this.get('selected');
     const current  = selected ? selected.clone() : moment.utc();
